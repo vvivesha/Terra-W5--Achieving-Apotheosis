@@ -7,6 +7,7 @@ time.sleep(0.2)
 print("Your eyelids flutter as you regain your consciousness...")
 time.sleep(0.1)
 import turtle
+screen.tracer(0) #instant drawings w/ turtle!! Hopefully!! :D
 screen = turtle.Screen()
 
 width = screen.window_width() / 2
@@ -29,6 +30,9 @@ player_x = player.xcor()
 player_y = player.ycor()
 move = False  #apparently I've been using "true" and "false" wrong (inside of strings) <-- reminder to use it properly, now and onwards.
 clear_timer = 0
+bounds_timer = 0
+z_timer = 0 #scripts' disappearing-cue-timer.
+boost_timer = 0 #spacebar's booster-timer
 #def player_coordinates():
     #global player_x
     #global player_y
@@ -40,7 +44,6 @@ time.sleep(1.5)
 z.penup()
 #z.goto(-300, -250)
 z.goto(0, 0)
-screen.tracer(0)
 z.dot(10, "gray")
 time.sleep(0.1)
 z.clear()
@@ -70,6 +73,15 @@ time.sleep(0.01)
 z.write("Woah", align = "center", font = ("Consolas", 20, "italic"))
 p.showturtle()
 
+def bounds_timer_time():
+    global bounds_timer
+    if 
+
+def z_clear(): #script-clearing (z-turtle's doing/write cmds)
+    global z_timer
+    if z_timer <= 0:
+        z.clear()
+
 def trail_clear():
     global move
     global clear_timer
@@ -80,20 +92,48 @@ def trail_clear():
             p.clear()
             clear_timer += 3
 
+def space_boost():
+    global boost_timer
+    if boost_timer <= 0:
+        
 
 def left():
     global n_max
     global player_x
+    global bounds_timer
     if player_x <= n_max:
+        bounds_timer += 3
+    if bounds_timer > 0 or player_x <= n_max:
         p.fillcolor("red")
-        time.sleep(0.1)
-        p.fillcolor("orange")
+        z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
+        z_timer += 3
+        bounds_timer -= 1
     else:
-        p.left(180)
+        p.fillcolor("orange")
+        p.setheading(0) #right (positioner/angler/directional stability!!)
+        p.left(180) #left
         p.forward(10) #might need to change
         
+def right():
+    global p_max
+    global player_x
+    if bounds_timer > 0 or player_x >= p_max:
+        p.fillcolor("red")
+        z.write("Too far out!", align = "right", font = ("Consolas", 15, "underline"))
+        z_timer += 3
+        bounds_timer += 3
+    else:
+        p.fillcolor("orange")
+        p.setheading(0) #right
+        p.forward(10) #also might need to change...
 
-    
+screen.onkey(left, "Left")
+screen.listen()
+screen.onkey(right, "Right")
+screen.listen()
+screen.onkey(space_boost, "Space")
+screen.listen()
+
 while True:
-    trail_clear()
+    trail_clear()  #ig this could also go under left() and right() and still function the same, but any weird movement-related glitches will be caught under this locations, so the cmd will be living over here :>
     screen.update()
