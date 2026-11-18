@@ -25,6 +25,15 @@ p.goto(0, -200)
 p.shape("turtle")
 p.fillcolor("orange")
 
+player_x = player.xcor()
+player_y = player.ycor()
+move = False  #apparently I've been using "true" and "false" wrong (inside of strings) <-- reminder to use it properly, now and onwards.
+clear_timer = 0
+#def player_coordinates():
+    #global player_x
+    #global player_y
+    
+
 z.color("orange") #orange = script
 z.write("... where am I?", align = "center", font = ("Consolas", 20, "italic"))
 time.sleep(1.5)
@@ -61,6 +70,30 @@ time.sleep(0.01)
 z.write("Woah", align = "center", font = ("Consolas", 20, "italic"))
 p.showturtle()
 
+def trail_clear():
+    global move
+    global clear_timer
+    if move == True:
+        if clear_timer > 0:
+            clear_timer -= 1
+        else:
+            p.clear()
+            clear_timer += 3
+
+
 def left():
     global n_max
+    global player_x
+    if player_x <= n_max:
+        p.fillcolor("red")
+        time.sleep(0.1)
+        p.fillcolor("orange")
+    else:
+        p.left(180)
+        p.forward(10) #might need to change
+        
+
     
+while True:
+    trail_clear()
+    screen.update()
