@@ -14,13 +14,19 @@ width = screen.window_width() / 2
 height = screen.window_height() / 2
 n_max = width * -1  #negative max coordinate x-axis/horizontal
 p_max = width  #positive max coordinate x-axis/horizontal
+u_max = height
+d_max = height * -1
 #going to assume that a safe screen-size for most users will be -3000 to -250 and 300 to 250 ish.
 
 screen.Title(level + " | Acheiving Apotheosis | " + realm)
 screen.bgcolor("black")
 
-z = turtle.Turtle()
-p = turtle.Turtle()
+z = turtle.Turtle()  #zenith-turtle (aka pen-turtle)
+p = turtle.Turtle()  #player-turtle
+s = turtle.Turtle()  #stats-turtle
+s.hideturtle()
+s.penup()
+s.goto(p_max, u_max)  #basically, "always go to user's upper-right corner." (Will always right-align text)
 p.hideturtle()
 p.goto(0, -200)
 p.shape("turtle")
@@ -72,25 +78,30 @@ screen.bgcolor("gray")
 time.sleep(0.01)
 z.write("Woah", align = "center", font = ("Consolas", 20, "italic"))
 
-for intro_scene_loop in range(4):
-    p.showturtle()
-    p.fillcolor("gray")
-    time.sleep(0.1)
-    p.fillcolor("orange")
-    time.sleep(0.8)
-    p.fillcolor("gray") #or white; we'll see which looks cooler :>
-    time.sleep(0.1)
+def player_spawn():
+    for intro_scene_loop in range(4):
+        p.showturtle()
+        p.fillcolor("gray")
+        time.sleep(0.1)
+        p.fillcolor("orange")
+        time.sleep(0.8)
+        p.fillcolor("gray") #or white; we'll see which looks cooler :>
+        time.sleep(0.1)
 
-def bounds_timer_time():
+def bounds_timer_time():  #while True'ed
     global bounds_timer
-    if 
+    if bounds_timer < 0:
+        bounds_timer = 0
+    if bounds_timer >= 0:
+        s.clear()
+        s.write(".b." + bounds_timer + ".t." + clear_timer + ".s." + boost_timer, align = "right", font = ("Courier New", 5, "bold"))
 
 def z_clear(): #script-clearing (z-turtle's doing/write cmds)
     global z_timer
     if z_timer <= 0:
         z.clear()
 
-def trail_clear():
+def trail_clear():  #while True'ed
     global move
     global clear_timer
     if move == True:
@@ -144,4 +155,5 @@ screen.listen()
 
 while True:
     trail_clear()  #ig this could also go under left() and right() and still function the same, but any weird movement-related glitches will be caught under this locations, so the cmd will be living over here :>
+    bounds_timer_time()
     screen.update()
