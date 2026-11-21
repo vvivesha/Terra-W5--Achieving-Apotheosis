@@ -71,7 +71,15 @@ z.clear()
 screen.bgcolor("gray")
 time.sleep(0.01)
 z.write("Woah", align = "center", font = ("Consolas", 20, "italic"))
-p.showturtle()
+
+for intro_scene_loop in range(4):
+    p.showturtle()
+    p.fillcolor("gray")
+    time.sleep(0.1)
+    p.fillcolor("orange")
+    time.sleep(0.8)
+    p.fillcolor("gray") #or white; we'll see which looks cooler :>
+    time.sleep(0.1)
 
 def bounds_timer_time():
     global bounds_timer
