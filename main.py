@@ -16,10 +16,18 @@ p_max = width/2  #positive max coordinate x-axis/horizontal
 u_max = height/2
 d_max = (height/2) * -1
 spawn_y = (d_max / 10) * 8
+spawn_dist = (d_max / 10) * 2
 spawn = (0, spawn_y)
+header_y = (u_max / 10 ) * 8  #now quarter_spawn_anim has to go from 8/10 aka 4/5 down to spawn.
+header_dist = (u_max / 10) * 2
+header = (0, header_y)
+#quarter_spawn_anim = (height - (2/10 * d_max)) / 4
+#header
+quarter_spawn_anim = (height - (header_dist + spawn_dist)) / 4
 #going to assume that a safe screen-size for most users will be -3000 to -250 and 300 to 250 ish.
 
 level = 0
+level_complete = False  #marks whether or not you finished the level. (so players can move on to the next one!!)
 realm = "Colorless Realm"
 
 screen.title(str(level) + " | Acheiving Apotheosis | " + realm)
@@ -39,6 +47,20 @@ p.hideturtle()
 p.goto(0, -200)
 p.shape("turtle")
 p.fillcolor("orange")
+
+#to see if the things work!
+#p.showturtle()
+#time.sleep(2)
+#screen.tracer(1)
+#p.goto(0, u_max)
+#time.sleep(2)
+#p.goto(header)
+#time.sleep(2)
+#p.goto(0, u_max)
+#screen.tracer(1)
+#p.speed(3)
+#p.goto(spawn)
+#time.sleep(2)
 
 def player_coordinates():
     global player_x
@@ -77,31 +99,70 @@ z.dot(200, "gray")
 time.sleep(0.06)
 z.dot(250, "gray")
 time.sleep(0.06)
-z.dot(300, "gray")
+z.dot(280, "gray")
 time.sleep(0.06)
 z.clear()
 screen.bgcolor("gray")
 time.sleep(0.01)
 z.write("Woah", align = "center", font = ("Consolas", 20, "italic"))
-screen.tracer(0) #instant drawings w/ turtle!! Hopefully!! :D
+screen.tracer(0) #instant drawings w/ turtle!! Hopefully!! :D    #MOVED from ABOVE!!!!!!!!!  #moved screen.tracer(0) from here.  *disregard these comments pls*
+
+def intro_scene():
+    for intro_scene_loop in range(4):
+        #player_spawn_anim()
+        p.showturtle()   #might be a bit redundant..?
+        p.pencolor("white")
+        time.sleep(0.1)
+        p.pencolor("orange")
+        time.sleep(0.8)
+        p.pencolor("white")
+        time.sleep(0.1)
+        #p.fillcolor("gray") #or white; we'll see which looks cooler :>
+        #time.sleep(0.1)
+
+def player_spawn_anim():  #CALLING ONCE MOVES ONLY 1/4 OF WAY DOWN THE SCREEN!!!  <-- DISREGARD THAT!
+    screen.tracer(0)
+    p.hideturtle()
+    p.setheading(0)
+    p.left(90)
+    p.penup()
+    p.goto(header)
+    p.showturtle()
+    #intro_scene()
+    #p.backward(quarter_spawn_anim)  #or (d_max - spawn_y) + u_max / 4     prob not that one..
+    ##OR: [height - (2/10 * d_max)] / 4  <-- THISS!
+    #time.sleep(0.25)  #1 second / 4    XD
+    screen.tracer(1)
+    p.speed(3)
+    p.goto(spawn)
+    intro_scene()
 
 def player_spawn():
-    for intro_scene_loop in range(4):
-        p.showturtle()
-        p.fillcolor("white")
-        p.pencolor("orange")
-        time.sleep(0.1)
-        p.fillcolor("orange")
-        p.pencolor("white")
-        time.sleep(0.8)
-        p.fillcolor("gray") #or white; we'll see which looks cooler :>
-        time.sleep(0.1)
+    global header
+    p.pensize(30)
     p.hideturtle()
+    p.penup()
+    p.goto(header)
+    p.fillcolor("orange")  #or which other color??
+    for intro_scene_loop in range(4):
+        player_spawn_anim()
+        p.showturtle()   #might be a bit redundant..?
+        p.pencolor("white")
+        time.sleep(0.1)
+        p.pencolor("orange")
+        time.sleep(0.8)
+        p.pencolor("white")
+        time.sleep(0.1)
+        #p.fillcolor("gray") #or white; we'll see which looks cooler :>
+        #time.sleep(0.1)
+    p.hideturtle()
+    p.goto(spawn)  #look back at this soon/later!!
     z.clear()
 
 def level_up():
     global level
     global realm
+    z.clear()
     z.goto(0, 0)
     z.fillcolor("orange")
     z.pencolor("white")
@@ -111,10 +172,26 @@ def level_up():
     p.fillcolor("white")
     p.color("orange")
     p.goto(spawn)
+    p.hideturtle()
+    p.setheading(0)
     p.left(90)
     p.showturtle()
+    time.sleep(2)
+    z.clear()
 
-player_spawn()
+def spawn_animation():
+    global header
+    global header_y
+    global level
+    global level_complete
+    player_spawn()
+    #next level: 
+    if level_complete == True:
+        level_up()  #for whenever you actually move up in the game's levels:
+    #same level (oof):
+    
+#player_spawn()
+player_spawn_anim()
 level_up()
 
 def bounds_timer_time():  #while True'ed
@@ -131,6 +208,7 @@ def bounds_error_check():
     global n_max
     global p_max
     global player_x
+    global z_timer
     z.color("red")
     #left-side:
     if player_x < n_max:
