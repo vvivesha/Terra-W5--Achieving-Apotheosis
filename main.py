@@ -36,9 +36,13 @@ screen.bgcolor("black")
 z = turtle.Turtle()  #zenith-turtle (aka pen-turtle)
 p = turtle.Turtle()  #player-turtle
 s = turtle.Turtle()  #stats-turtle
+b = turtle.Turtle()  #boost-turtle
 p.shapesize(stretch_wid = 5, stretch_len = 5, outline = 1) #had to research this!
 z.hideturtle()
 s.hideturtle()
+b.hideturtle()
+b.penup()
+b.goto(n_max, u_max)
 s.penup()
 p.penup()
 z.penup()
@@ -74,6 +78,7 @@ bounds_timer = 0
 z_timer = 0 #scripts' disappearing-cue-timer.
 boost_timer = 0 #spacebar's booster-timer
 boost = False
+rebound_trigger = False
 #def player_coordinates():
     #global player_x
     #global player_y
@@ -193,14 +198,31 @@ def spawn_animation():
 #player_spawn()
 player_spawn_anim()
 level_up()
+screen.tracer(0)
 
-def bounds_timer_time():  #while True'ed
-    global bounds_timer
-    if bounds_timer < 0:
-        bounds_timer = 0
-    if bounds_timer >= 0:
-        s.clear()
-        s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font = ("Courier New", 5, "bold"))
+#def boost_timer_time():  #while True'ed
+    #global boost_timer
+    #s.clear()
+    #s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font = ("Courier New", 5, "bold"))
+    #if boost_timer == 0:
+        #s.clear()
+        #s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font = ("Courier New", 5, "bold"))
+
+#def bounds_timer_time():  #while True'ed
+    #global bounds_timer
+    #if bounds_timer < 0:
+        #bounds_timer = 0
+    #if bounds_timer >= 0:
+        #s.clear()
+        #s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font = ("Courier New", 5, "bold"))
+
+def rebound():
+    global rebound_trigger
+    if rebound_trigger == True:
+        p.pencolor("red")
+        p.backward(80)
+        #p.pencolor("orange")
+        #bounds_error = False #error-able
 
 def bounds_error_check():
     global bounds_timer
@@ -211,24 +233,33 @@ def bounds_error_check():
     global z_timer
     z.color("red")
     #left-side:
-    if player_x < n_max:
+    if player_x <= n_max:
         bounds_error = True
         z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
         bounds_timer += 3
+        #rebound()
+        #time.sleep(3)
+        z_clear()
     else:
         bounds_error = False
+        p.pencolor("orange")
+    #right-side:
+    if player_x >= p_max:
+        bounds_error = True
+        z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
+        bounds_timer += 3
+        #rebound()
+        #time.sleep(3)
+        z_clear()
+    else:
+        bounds_error = False
+        p.pencolor("orange")
     if bounds_error == True:
         p.fillcolor("red")
+        rebound()
         z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
         z_timer += 3
         bounds_timer -= 1
-    #right-side:
-    if player_x > p_max:
-        bounds_error = True
-        z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
-        bounds_timer += 3
-    else:
-        bounds_error = False
 
 def z_clear(): #script-clearing (z-turtle's doing/write cmds)
     global z_timer
@@ -241,6 +272,8 @@ def trail_clear():  #while True'ed
     if move == True:
         if clear_timer > 0:
             clear_timer -= 1
+            if clear_timer == 0:
+                move = False
         else:
             p.clear()
             clear_timer += 3
@@ -257,6 +290,7 @@ def space_boost():
         s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font =("Courier New", 5, "bold"))
 
 def left():
+    global move
     global n_max
     global player_x
     global bounds_timer
@@ -265,17 +299,22 @@ def left():
     p.fillcolor("orange")
     p.setheading(0) #right (positioner/angler/directional stability!!)
     if boost == False:
+        p.pencolor("orange")
         p.left(180)  #left
         p.forward(10) #might need to change
+        move = True
         bounds_error_check()
     else: #boost == True:
+        p.pencolor("green")
         p.left(180)  #left
         p.forward(30) #also might need to change, but should stay x3 of non-boosted's move-distance.
+        move = True
         bounds_error_check()
         boost = False
         boost_timer += 3
         
 def right():
+    global move
     global p_max
     global player_x
     global bounds_timer
@@ -285,9 +324,11 @@ def right():
     p.setheading(0) #right
     #p.forward(10) #also might need to change
     if boost == False:
+        p.pencolor("orange")
         p.forward(10)
         bounds_error_check()
-    else:  #boost == False:
+    else:  #boost == True:
+        p.pencolor("green")
         p.forward(30)
         bounds_error_check()
         boost = False
@@ -300,10 +341,34 @@ screen.listen()
 screen.onkey(space_boost, "space")
 screen.listen()
 
+def timer_manager():
+    global bounds_timer
+    global boost_timer
+    global clear_timer
+    if boost_timer > 0:
+        boost_timer -= 1
+    if bounds_timer > 0:
+        bounds_timer -= 1
+    if clear_timer > 0:
+        clear_timer -= 1
+    s.clear()
+    s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font =("Courier New", 5, "bold"))
+    screen.ontimer(timer_manager, 1000)
+
+def bounds_check_runner():
+    global move
+    global bounds_timer
+    global bounds_error
+    screen.ontimer(bounds_error_check, 1000)
+
+timer_manager()
+bounds_check_runner()
+
 while True:
     #screen.title(level + " | Acheiving Apotheosis | " + realm)
     player_coordinates()
     trail_clear()  #ig this could also go under left() and right() and still function the same, but any weird movement-related glitches will be caught under this locations, so the cmd will be living over here :>
     bounds_error_check()
-    bounds_timer_time()
+    #bounds_timer_time()
+    #boost_timer_time()
     screen.update()
