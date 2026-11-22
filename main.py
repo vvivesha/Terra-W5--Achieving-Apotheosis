@@ -9,13 +9,13 @@ time.sleep(0.1)
 import turtle
 screen = turtle.Screen()
 
-width = screen.window_width() / 2
-height = screen.window_height() / 2
-n_max = width * -1  #negative max coordinate x-axis/horizontal
-p_max = width  #positive max coordinate x-axis/horizontal
-u_max = height
-d_max = height * -1
-spawn_y = (d_max / 5) * 4
+width = screen.window_width()
+height = screen.window_height()
+n_max = (width/2) * -1  #negative max coordinate x-axis/horizontal
+p_max = width/2  #positive max coordinate x-axis/horizontal
+u_max = height/2
+d_max = (height/2) * -1
+spawn_y = (d_max / 10) * 8
 spawn = (0, spawn_y)
 #going to assume that a safe screen-size for most users will be -3000 to -250 and 300 to 250 ish.
 
@@ -40,8 +40,12 @@ p.goto(0, -200)
 p.shape("turtle")
 p.fillcolor("orange")
 
-player_x = p.xcor()
-player_y = p.ycor()
+def player_coordinates():
+    global player_x
+    global player_y
+    player_x = p.xcor()
+    player_y = p.ycor()
+
 move = False  #apparently I've been using "true" and "false" wrong (inside of strings) <-- reminder to use it properly, now and onwards.
 clear_timer = 0
 bounds_timer = 0
@@ -127,9 +131,11 @@ def bounds_error_check():
     global n_max
     global p_max
     global player_x
+    z.color("red")
     #left-side:
     if player_x < n_max:
         bounds_error = True
+        z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
         bounds_timer += 3
     else:
         bounds_error = False
@@ -141,6 +147,7 @@ def bounds_error_check():
     #right-side:
     if player_x > p_max:
         bounds_error = True
+        z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
         bounds_timer += 3
     else:
         bounds_error = False
@@ -163,9 +170,10 @@ def trail_clear():  #while True'ed
 def space_boost():
     global boost_timer
     global boost
-    boost = True
     if boost_timer < 0:
         boost_timer = 0
+    if boost_timer == 0:
+        boost = True
     if boost_timer >= 0:
         s.clear()
         s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font =("Courier New", 5, "bold"))
@@ -174,32 +182,38 @@ def left():
     global n_max
     global player_x
     global bounds_timer
+    global boost
+    global boost_timer
     p.fillcolor("orange")
     p.setheading(0) #right (positioner/angler/directional stability!!)
-    if boost == True:
-        p.left(180)
+    if boost == False:
+        p.left(180)  #left
+        p.forward(10) #might need to change
+        bounds_error_check()
+    else: #boost == True:
+        p.left(180)  #left
         p.forward(30) #also might need to change, but should stay x3 of non-boosted's move-distance.
         bounds_error_check()
         boost = False
-    elif boost == False:
-        p.left(180) #left
-        p.forward(10) #might need to change
-        bounds_error_check()
+        boost_timer += 3
         
 def right():
     global p_max
     global player_x
     global bounds_timer
+    global boost
+    global boost_timer
     p.fillcolor("orange")
     p.setheading(0) #right
-    p.forward(10) #also might need to change
-    if boost == True:
+    #p.forward(10) #also might need to change
+    if boost == False:
+        p.forward(10)
+        bounds_error_check()
+    else:  #boost == False:
         p.forward(30)
         bounds_error_check()
         boost = False
-    elif boost == False:
-        p.forward(10)
-        bounds_error_check()
+        boost_timer += 3
 
 screen.onkey(left, "Left")
 screen.listen()
@@ -210,6 +224,7 @@ screen.listen()
 
 while True:
     #screen.title(level + " | Acheiving Apotheosis | " + realm)
+    player_coordinates()
     trail_clear()  #ig this could also go under left() and right() and still function the same, but any weird movement-related glitches will be caught under this locations, so the cmd will be living over here :>
     bounds_error_check()
     bounds_timer_time()
