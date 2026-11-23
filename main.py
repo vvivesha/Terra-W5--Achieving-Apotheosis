@@ -60,6 +60,8 @@ survive = False
 level_over = False
 next_b = True
 b_alive = False
+obstacles_evaded = 0
+obstacles_count = 8
 
 screen.title(str(level) + " | Acheiving Apotheosis | " + realm)
 screen.bgcolor("black")
@@ -229,7 +231,8 @@ def obstacles_moving():  #while True'ed
     global level
     global level_over
     global next_b
-    screen.tracer(1)
+    global z_timer
+    screen.tracer(0)
     if b_alive == False:
         return
     b.sety(b.ycor() - (10 + level * 2))  #tuff for making lvls get harder
@@ -247,55 +250,16 @@ def obstacles_moving():  #while True'ed
         z.goto(header)
         b.sety(b.ycor() - 10)
         z.write("Keep climbing!", align = "center", font = ("Courier New", 20, "italic"))
-        screen.update(0)
-        for descend in range(5):
-            b.sety(b.ycor() - 10)
-            screen.update(0)
-    #b.pendown()
-    #b.forward(50)
-    #b.right(90)
-    #b.forward(25)
-    #b.right(90)
-    #b.forward(50)
-    #b.right(90)
-    #b.forward(25)
-    #b.penup()
-    ##next
-    #for repeat in range(5):
-        #screen.ontimer(obstacle_config, 5000)
-
-
-
-        #b.shape("square")
-        #b.shapesize(v, v)
-        #b.goto(x, y)
-        #b.setheading(0)
-        #b.right(90)
-        #b.pendown()
-        #b.forward(50)
-        #b.right(90)
-        #b.forward(25)
-        #b.right(90)
-        #b.forward(50)
-        #b.right(90)
-        #b.forward(25)
-        #b.penup()
-        
-
-
-            #edit chunks below:
-#those chunks were while True'ed... :D
-                #may or may not need the parts below..?
-            #if level_over == True:
-                #if p.distance(b) > v:
-                    #survive = True
-                    #died = False
-                    #level_up()
-                #if p.distance(b) < v:
-                    #died = True
-                    #survive = False
-
-        
+        screen.update()
+        z_timer += 3
+    if b.ycor() < d_max:
+        obstacles_evaded += 1
+        if obstacles_count <= obstacles_evaded:
+            obstacles_count += 2
+            obstacles_evaded = 0
+            level_up()
+        else:
+            obstacle_spawn()
 
 def level_up():
     global level
@@ -318,7 +282,8 @@ def level_up():
     time.sleep(2)
     z.clear()
     level_over = False
-    screen.ontimer(obstacles_moving, 10)  #should prevent recursion errors!
+    #that line prob was messing with my code..
+    obstacle_spawn()
 
 def spawn_animation():
     global header
@@ -530,3 +495,5 @@ while True:
     #screen.ontimer(b_clear, 3000)
     z_clear()
     screen.update()
+    #overloaded so 
+    time.sleep(0.02)
