@@ -30,11 +30,20 @@ p1 = p_max - 50
 d1 = u_max - 100
 u1 = u_max
 
+x = random.randint(int(n1), int(p1))
+y = random.randint(int(d1), int(u1))
+v = random.randint(2, 4)
+c = random.randint(2, 4)
+
 def randomizer():
     global x
     global y
     global v
     global c
+    global n1
+    global p1
+    global d1
+    global u1
     x = random.randint(int(n1), int(p1))
     y = random.randint(int(d1), int(u1))
     v = random.randint(2, 50)
@@ -49,7 +58,7 @@ realm = "Colorless Realm"
 died = False
 survive = False
 level_over = False
-next_b = False
+next_b = True
 
 screen.title(str(level) + " | Acheiving Apotheosis | " + realm)
 screen.bgcolor("black")
@@ -86,6 +95,9 @@ p.fillcolor("orange")
 #p.speed(3)
 #p.goto(spawn)
 #time.sleep(2)
+
+player_x = p.xcor()
+player_y = p.ycor()
 
 def player_coordinates():
     global player_x
@@ -133,85 +145,6 @@ time.sleep(0.01)
 z.write("Woah", align = "center", font = ("Consolas", 20, "italic"))
 screen.tracer(0) #instant drawings w/ turtle!! Hopefully!! :D    #MOVED from ABOVE!!!!!!!!!  #moved screen.tracer(0) from here.  *disregard these comments pls*
 
-def obstacles_moving():  #while True'ed
-    global header_y
-    global x
-    global y
-    global v
-    global c
-    global survive
-    global died
-    global level
-    global level_over
-    global next_b
-    screen.tracer(0)
-    b.goto(0, header_y)
-    b.setheading(0)
-    b.right(90)
-    ##commented out bc it's too complex for now, but might use later!
-    b.shape("square")
-    b.shapesize(5, 5)
-    b.setheading(0)
-    b.right(90)
-    b.speed(2)
-    b.forward(500)
-    #b.pendown()
-    #b.forward(50)
-    #b.right(90)
-    #b.forward(25)
-    #b.right(90)
-    #b.forward(50)
-    #b.right(90)
-    #b.forward(25)
-    #b.penup()
-    ##next
-    for obstacles in range(5):
-        if next_b == True:
-            randomizer()
-            b.goto(x, y)
-            b.shapesize(v, v)
-            b.color("red")
-            b.shape("square")
-        #b.shape("square")
-        #b.shapesize(v, v)
-        #b.goto(x, y)
-        #b.setheading(0)
-        #b.right(90)
-        #b.pendown()
-        #b.forward(50)
-        #b.right(90)
-        #b.forward(25)
-        #b.right(90)
-        #b.forward(50)
-        #b.right(90)
-        #b.forward(25)
-        #b.penup()
-            if p.distance(b) > v:
-                next_b = True
-            if p.distance(b) < v:
-                next_b = False
-            if next_b == False:
-                died = True
-                survive = False
-                level_over = False
-                b.clear()
-                z.clear()
-                p.clear()
-                player_spawn()
-                #may or may not need the parts below..?
-            if level_over == True:
-                if p.distance(b) > v:
-                    survive = True
-                    died = False
-                    level_up()
-                if p.distance(b) < v:
-                    died = True
-                    survive = False
-                    b.clear()
-                    z.clear()
-                    p.clear()
-                    player_spawn()
-
 def intro_scene():
     for intro_scene_loop in range(4):
         #player_spawn_anim()
@@ -242,7 +175,7 @@ def player_spawn_anim():  #CALLING ONCE MOVES ONLY 1/4 OF WAY DOWN THE SCREEN!!!
     p.goto(spawn)
     intro_scene()
     died = False
-    survived = False
+    survive = False
 
 def player_spawn():
     global header
@@ -251,20 +184,162 @@ def player_spawn():
     p.penup()
     p.goto(header)
     p.fillcolor("orange")  #or which other color??
-    for intro_scene_loop in range(4):
-        player_spawn_anim()
-        p.showturtle()   #might be a bit redundant..?
-        p.pencolor("white")
-        time.sleep(0.1)
-        p.pencolor("orange")
-        time.sleep(0.8)
-        p.pencolor("white")
-        time.sleep(0.1)
+    #for intro_scene_loop in range(4):
+    player_spawn_anim()
+    p.showturtle()   #might be a bit redundant..?
+    p.pencolor("white")
+    time.sleep(0.1)
+    p.pencolor("orange")
+    time.sleep(0.8)
+    p.pencolor("white")
+    time.sleep(0.1)
         #p.fillcolor("gray") #or white; we'll see which looks cooler :>
         #time.sleep(0.1)
-    p.hideturtle()
+    p.turtle()
     p.goto(spawn)  #look back at this soon/later!!
     z.clear()
+
+def obstacle_spawn():
+    global header_y
+    global spawn_y
+    global x
+    global y
+    global v
+    global survive
+    global died
+    global level
+    global level_over
+    global next_b
+    global b_alive
+    randomizer()
+    b.hideturtle()
+    b.penup()
+    b.goto(x, header_y)
+    b.setheading(0)
+    b.color("red")
+    b.shape("square")
+    b.shapesize (v, v)
+    b.showturtle()
+    while b_alive:
+        if b.distance(0, 0) > int(u_max):
+            next_b = True
+            break
+        if p.distance(b) < v:
+            next_b = False
+            break
+        else:
+            b.sety(b.ycor() - 10)  #thanks to research!!
+            screen.update()
+        #if p.distance(b) > v:
+            #next_b = True
+    #for obstacles in range(5):
+        #if next_b == True:
+            #screen.tracer(1)
+            #b.showturtle()
+            #randomizer()
+            #b.goto(x, y)
+            #b.shapesize(v, v)
+            #b.color("red")
+            #b.shape("square")
+            #b.setheading(0)
+            #b.right(90)
+            #b.speed(10)
+            #b.goto(x, spawn_y)
+            ##screen.ontimer()
+            #if p.distance(b) > v:
+                #next_b = True
+            #if p.distance(b) < v:
+                #next_b = False
+                #died = True
+                #survive = False
+                #level_over = False
+                #z.clear()
+                #p.clear()
+                #player_spawn()
+            #if next_b == False:
+                #died = True
+                #survive = False
+                #level_over = False
+                #z.clear()
+                #p.clear()
+                #player_spawn()
+
+def obstacles_moving():  #while True'ed
+    global header_y
+    global spawn_y
+    global x
+    global y
+    global v
+    global c
+    global survive
+    global died
+    global level
+    global level_over
+    global next_b
+    screen.tracer(0)
+    if next_b == True:
+        b.goto(0, header_y)
+        b.setheading(0)
+        b.right(90)
+    ##commented out bc it's too complex for now, but might use later!
+        b.shape("square")
+        b.shapesize(5, 5)
+        b.setheading(0)
+        b.right(90)
+        b.goto(x, -30)
+    else:
+        z.goto(header)
+        b.sety(b.ycor() - 10)
+        z.write("Keep climbing!", align = "center", font = ("Courier New", 20, "italic"))
+        screen.update(0)
+        for descend in range(5):
+            b.sety(b.ycor() - 10)
+            screen.update(0)
+    #b.pendown()
+    #b.forward(50)
+    #b.right(90)
+    #b.forward(25)
+    #b.right(90)
+    #b.forward(50)
+    #b.right(90)
+    #b.forward(25)
+    #b.penup()
+    ##next
+    #for repeat in range(5):
+        #screen.ontimer(obstacle_config, 5000)
+
+
+
+        #b.shape("square")
+        #b.shapesize(v, v)
+        #b.goto(x, y)
+        #b.setheading(0)
+        #b.right(90)
+        #b.pendown()
+        #b.forward(50)
+        #b.right(90)
+        #b.forward(25)
+        #b.right(90)
+        #b.forward(50)
+        #b.right(90)
+        #b.forward(25)
+        #b.penup()
+        
+
+
+            #edit chunks below:
+#those chunks were while True'ed... :D
+                #may or may not need the parts below..?
+            #if level_over == True:
+                #if p.distance(b) > v:
+                    #survive = True
+                    #died = False
+                    #level_up()
+                #if p.distance(b) < v:
+                    #died = True
+                    #survive = False
+
+        
 
 def level_up():
     global level
@@ -287,82 +362,7 @@ def level_up():
     time.sleep(2)
     z.clear()
     level_over = False
-    obstacles_moving()
-
-def obstacles_moving():  #while True'ed
-    global header_y
-    global x
-    global y
-    global v
-    global c
-    global survive
-    global died
-    global level
-    global level_over
-    global next_b
-    screen.tracer(0)
-    b.goto(0, header_y)
-    b.setheading(0)
-    b.right(90)
-    ##commented out bc it's too complex for now, but might use later!
-    b.shape("square")
-    b.shapesize(5, 5)
-    #b.pendown()
-    #b.forward(50)
-    #b.right(90)
-    #b.forward(25)
-    #b.right(90)
-    #b.forward(50)
-    #b.right(90)
-    #b.forward(25)
-    #b.penup()
-    ##next
-    for obstacles in range(5):
-        if next_b == True:
-            randomizer()
-            b.goto(x, y)
-            b.shapesize(v, v)
-            b.color("red")
-            b.shape("square")
-        #b.shape("square")
-        #b.shapesize(v, v)
-        #b.goto(x, y)
-        #b.setheading(0)
-        #b.right(90)
-        #b.pendown()
-        #b.forward(50)
-        #b.right(90)
-        #b.forward(25)
-        #b.right(90)
-        #b.forward(50)
-        #b.right(90)
-        #b.forward(25)
-        #b.penup()
-            if p.distance(b) > v:
-                next_b = True
-            if p.distance(b) < v:
-                next_b = False
-            if next_b == False:
-                died = True
-                survive = False
-                level_over = False
-                b.clear()
-                z.clear()
-                p.clear()
-                player_spawn()
-                #may or may not need the parts below..?
-            if level_over == True:
-                if p.distance(b) > v:
-                    survive = True
-                    died = False
-                    level_up()
-                if p.distance(b) < v:
-                    died = True
-                    survive = False
-                    b.clear()
-                    z.clear()
-                    p.clear()
-                    player_spawn()
+    screen.ontimer(obstacles_moving, 10)  #should prevent recursion errors!
 
 def spawn_animation():
     global header
@@ -375,10 +375,6 @@ def spawn_animation():
         level_up()  #for whenever you actually move up in the game's levels:
     #same level (oof):
     
-#player_spawn()
-player_spawn_anim()
-level_up()
-screen.tracer(0)
 
 #def boost_timer_time():  #while True'ed
     #global boost_timer
@@ -550,7 +546,24 @@ def bounds_check_runner():
 timer_manager()
 bounds_check_runner()
 
+#player_spawn()
+player_spawn_anim()
+level_up()
+screen.tracer(0)
+
 while True:
+    if died == True:
+        player_spawn()
+    if survive == True:
+        level_up()
+    if survive == True and died == False:
+        level_over = True
+        died = False
+        level_up()
+    if survive == False and died == True:
+        z.clear()
+        p.clear()
+        player_spawn()
     #screen.title(level + " | Acheiving Apotheosis | " + realm)
     player_coordinates()
     trail_clear()  #ig this could also go under left() and right() and still function the same, but any weird movement-related glitches will be caught under this locations, so the cmd will be living over here :>
@@ -558,5 +571,6 @@ while True:
     obstacles_moving()
     #bounds_timer_time()
     #boost_timer_time()
+    #screen.ontimer(b_clear, 3000)
     z_clear()
     screen.update()
