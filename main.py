@@ -27,7 +27,7 @@ quarter_spawn_anim = (height - (header_dist + spawn_dist)) / 4
 
 n1 = n_max + 50
 p1 = p_max - 50
-d1 = u_max - 100
+d1 = d_max + 50
 u1 = u_max
 
 x = random.randint(int(n1), int(p1))
@@ -46,8 +46,8 @@ def randomizer():
     global u1
     x = random.randint(int(n1), int(p1))
     y = random.randint(int(d1), int(u1))
-    v = random.randint(2, 50)
-    c = random.randint(2, 50)
+    v = random.randint(2, 4)
+    c = random.randint(2, 4)
 
 #x_co = p_max - random()
 #going to assume that a safe screen-size for most users will be -3000 to -250 and 300 to 250 ish.
@@ -59,6 +59,7 @@ died = False
 survive = False
 level_over = False
 next_b = True
+b_alive = False
 
 screen.title(str(level) + " | Acheiving Apotheosis | " + realm)
 screen.bgcolor("black")
@@ -66,8 +67,8 @@ screen.bgcolor("black")
 z = turtle.Turtle()  #zenith-turtle (aka pen-turtle)
 p = turtle.Turtle()  #player-turtle
 s = turtle.Turtle()  #stats-turtle
-b = turtle.Turtle()  #boost-turtle
-p.shapesize(stretch_wid = 5, stretch_len = 5, outline = 1) #had to research this!
+b = turtle.Turtle()  #obstacle-turtle
+p.shapesize(stretch_wid = 3, stretch_len = 3, outline = 1) #had to research this!  smaller so it's easier to win
 z.hideturtle()
 s.hideturtle()
 b.hideturtle()
@@ -82,19 +83,6 @@ p.goto(0, -200)
 p.shape("turtle")
 p.fillcolor("orange")
 
-#to see if the things work!
-#p.showturtle()
-#time.sleep(2)
-#screen.tracer(1)
-#p.goto(0, u_max)
-#time.sleep(2)
-#p.goto(header)
-#time.sleep(2)
-#p.goto(0, u_max)
-#screen.tracer(1)
-#p.speed(3)
-#p.goto(spawn)
-#time.sleep(2)
 
 player_x = p.xcor()
 player_y = p.ycor()
@@ -112,9 +100,7 @@ z_timer = 0 #scripts' disappearing-cue-timer.
 boost_timer = 0 #spacebar's booster-timer
 boost = False
 rebound_trigger = False
-#def player_coordinates():
-    #global player_x
-    #global player_y
+bounds_error = False
     
 
 z.pencolor("orange") #orange = script
@@ -220,49 +206,16 @@ def obstacle_spawn():
     b.shape("square")
     b.shapesize (v, v)
     b.showturtle()
-    while b_alive:
-        if b.distance(0, 0) > int(u_max):
-            next_b = True
-            break
-        if p.distance(b) < v:
-            next_b = False
-            break
-        else:
-            b.sety(b.ycor() - 10)  #thanks to research!!
-            screen.update()
-        #if p.distance(b) > v:
-            #next_b = True
-    #for obstacles in range(5):
-        #if next_b == True:
-            #screen.tracer(1)
-            #b.showturtle()
-            #randomizer()
-            #b.goto(x, y)
-            #b.shapesize(v, v)
-            #b.color("red")
-            #b.shape("square")
-            #b.setheading(0)
-            #b.right(90)
-            #b.speed(10)
-            #b.goto(x, spawn_y)
-            ##screen.ontimer()
-            #if p.distance(b) > v:
-                #next_b = True
-            #if p.distance(b) < v:
-                #next_b = False
-                #died = True
-                #survive = False
-                #level_over = False
-                #z.clear()
-                #p.clear()
-                #player_spawn()
-            #if next_b == False:
-                #died = True
-                #survive = False
-                #level_over = False
-                #z.clear()
-                #p.clear()
-                #player_spawn()
+    b_alive = True
+    next_b = False
+    obstacles_moving()
+    if b.distance(0, 0) > int(u_max):
+        next_b = True
+    if p.distance(b) < v:
+        next_b = False
+    if b_alive == False:
+        b.sety(b.ycor() - 10)  #thanks to research!!
+        screen.update()
 
 def obstacles_moving():  #while True'ed
     global header_y
@@ -276,7 +229,10 @@ def obstacles_moving():  #while True'ed
     global level
     global level_over
     global next_b
-    screen.tracer(0)
+    screen.tracer(1)
+    if b_alive == False:
+        return
+    b.sety(b.ycor() - (10 + level * 2))  #tuff for making lvls get harder
     if next_b == True:
         b.goto(0, header_y)
         b.setheading(0)
