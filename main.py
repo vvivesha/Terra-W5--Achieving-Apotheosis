@@ -232,6 +232,8 @@ def obstacles_moving():  #while True'ed
     global level_over
     global next_b
     global z_timer
+    global obstacles_evaded
+    global obstacles_count
     screen.tracer(0)
     if b_alive == False:
         return
