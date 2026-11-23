@@ -25,13 +25,18 @@ header = (0, header_y)
 #header
 quarter_spawn_anim = (height - (header_dist + spawn_dist)) / 4
 
+n1 = n_max + 50
+p1 = p_max - 50
+d1 = u_max - 100
+u1 = u_max
+
 def randomizer():
     global x
     global y
     global v
     global c
-    x = random.randint(int(n_max), int(p_max))
-    y = random.randint(int(d_max), int(u_max))
+    x = random.randint(int(n1), int(p1))
+    y = random.randint(int(d1), int(u1))
     v = random.randint(2, 50)
     c = random.randint(2, 50)
 
@@ -127,6 +132,85 @@ screen.bgcolor("gray")
 time.sleep(0.01)
 z.write("Woah", align = "center", font = ("Consolas", 20, "italic"))
 screen.tracer(0) #instant drawings w/ turtle!! Hopefully!! :D    #MOVED from ABOVE!!!!!!!!!  #moved screen.tracer(0) from here.  *disregard these comments pls*
+
+def obstacles_moving():  #while True'ed
+    global header_y
+    global x
+    global y
+    global v
+    global c
+    global survive
+    global died
+    global level
+    global level_over
+    global next_b
+    screen.tracer(0)
+    b.goto(0, header_y)
+    b.setheading(0)
+    b.right(90)
+    ##commented out bc it's too complex for now, but might use later!
+    b.shape("square")
+    b.shapesize(5, 5)
+    b.setheading(0)
+    b.right(90)
+    b.speed(2)
+    b.forward(500)
+    #b.pendown()
+    #b.forward(50)
+    #b.right(90)
+    #b.forward(25)
+    #b.right(90)
+    #b.forward(50)
+    #b.right(90)
+    #b.forward(25)
+    #b.penup()
+    ##next
+    for obstacles in range(5):
+        if next_b == True:
+            randomizer()
+            b.goto(x, y)
+            b.shapesize(v, v)
+            b.color("red")
+            b.shape("square")
+        #b.shape("square")
+        #b.shapesize(v, v)
+        #b.goto(x, y)
+        #b.setheading(0)
+        #b.right(90)
+        #b.pendown()
+        #b.forward(50)
+        #b.right(90)
+        #b.forward(25)
+        #b.right(90)
+        #b.forward(50)
+        #b.right(90)
+        #b.forward(25)
+        #b.penup()
+            if p.distance(b) > v:
+                next_b = True
+            if p.distance(b) < v:
+                next_b = False
+            if next_b == False:
+                died = True
+                survive = False
+                level_over = False
+                b.clear()
+                z.clear()
+                p.clear()
+                player_spawn()
+                #may or may not need the parts below..?
+            if level_over == True:
+                if p.distance(b) > v:
+                    survive = True
+                    died = False
+                    level_up()
+                if p.distance(b) < v:
+                    died = True
+                    survive = False
+                    b.clear()
+                    z.clear()
+                    p.clear()
+                    player_spawn()
 
 def intro_scene():
     for intro_scene_loop in range(4):
@@ -272,7 +356,6 @@ def obstacles_moving():  #while True'ed
                     survive = True
                     died = False
                     level_up()
-                    level += 1
                 if p.distance(b) < v:
                     died = True
                     survive = False
