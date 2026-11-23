@@ -24,11 +24,27 @@ header = (0, header_y)
 #quarter_spawn_anim = (height - (2/10 * d_max)) / 4
 #header
 quarter_spawn_anim = (height - (header_dist + spawn_dist)) / 4
+
+def randomizer():
+    global x
+    global y
+    global v
+    global c
+    x = random.randint(int(n_max), int(p_max))
+    y = random.randint(int(d_max), int(u_max))
+    v = random.randint(2, 50)
+    c = random.randint(2, 50)
+
+#x_co = p_max - random()
 #going to assume that a safe screen-size for most users will be -3000 to -250 and 300 to 250 ish.
 
 level = 0
 level_complete = False  #marks whether or not you finished the level. (so players can move on to the next one!!)
 realm = "Colorless Realm"
+died = False
+survive = False
+level_over = False
+next_b = False
 
 screen.title(str(level) + " | Acheiving Apotheosis | " + realm)
 screen.bgcolor("black")
@@ -141,6 +157,8 @@ def player_spawn_anim():  #CALLING ONCE MOVES ONLY 1/4 OF WAY DOWN THE SCREEN!!!
     p.speed(3)
     p.goto(spawn)
     intro_scene()
+    died = False
+    survived = False
 
 def player_spawn():
     global header
@@ -167,6 +185,7 @@ def player_spawn():
 def level_up():
     global level
     global realm
+    global level_over
     z.clear()
     z.goto(0, 0)
     z.fillcolor("orange")
@@ -183,6 +202,84 @@ def level_up():
     p.showturtle()
     time.sleep(2)
     z.clear()
+    level_over = False
+    obstacles_moving()
+
+def obstacles_moving():  #while True'ed
+    global header_y
+    global x
+    global y
+    global v
+    global c
+    global survive
+    global died
+    global level
+    global level_over
+    global next_b
+    screen.tracer(0)
+    b.goto(0, header_y)
+    b.setheading(0)
+    b.right(90)
+    ##commented out bc it's too complex for now, but might use later!
+    b.shape("square")
+    b.shapesize(5, 5)
+    #b.pendown()
+    #b.forward(50)
+    #b.right(90)
+    #b.forward(25)
+    #b.right(90)
+    #b.forward(50)
+    #b.right(90)
+    #b.forward(25)
+    #b.penup()
+    ##next
+    for obstacles in range(5):
+        if next_b == True:
+            randomizer()
+            b.goto(x, y)
+            b.shapesize(v, v)
+            b.color("red")
+            b.shape("square")
+        #b.shape("square")
+        #b.shapesize(v, v)
+        #b.goto(x, y)
+        #b.setheading(0)
+        #b.right(90)
+        #b.pendown()
+        #b.forward(50)
+        #b.right(90)
+        #b.forward(25)
+        #b.right(90)
+        #b.forward(50)
+        #b.right(90)
+        #b.forward(25)
+        #b.penup()
+            if p.distance(b) > v:
+                next_b = True
+            if p.distance(b) < v:
+                next_b = False
+            if next_b == False:
+                died = True
+                survive = False
+                level_over = False
+                b.clear()
+                z.clear()
+                p.clear()
+                player_spawn()
+                #may or may not need the parts below..?
+            if level_over == True:
+                if p.distance(b) > v:
+                    survive = True
+                    died = False
+                    level_up()
+                    level += 1
+                if p.distance(b) < v:
+                    died = True
+                    survive = False
+                    b.clear()
+                    z.clear()
+                    p.clear()
+                    player_spawn()
 
 def spawn_animation():
     global header
@@ -231,20 +328,23 @@ def bounds_error_check():
     global p_max
     global player_x
     global z_timer
+    global rebound_trigger
     z.color("red")
     #left-side:
     if player_x <= n_max:
+        rebound_trigger = True
         bounds_error = True
         z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
         bounds_timer += 3
         #rebound()
         #time.sleep(3)
         z_clear()
-    else:
-        bounds_error = False
-        p.pencolor("orange")
+    #else:
+        #bounds_error = False
+        #p.pencolor("orange")
     #right-side:
-    if player_x >= p_max:
+    elif player_x >= p_max:
+        rebound_trigger = True
         bounds_error = True
         z.write("Too far out!", align = "left", font = ("Consolas", 15, "underline"))
         bounds_timer += 3
@@ -261,7 +361,7 @@ def bounds_error_check():
         z_timer += 3
         bounds_timer -= 1
 
-def z_clear(): #script-clearing (z-turtle's doing/write cmds)
+def z_clear(): #script-clearing (z-turtle's doing/write cmds) while True'ed
     global z_timer
     if z_timer <= 0:
         z.clear()
@@ -345,12 +445,15 @@ def timer_manager():
     global bounds_timer
     global boost_timer
     global clear_timer
+    global z_timer
     if boost_timer > 0:
         boost_timer -= 1
     if bounds_timer > 0:
         bounds_timer -= 1
     if clear_timer > 0:
         clear_timer -= 1
+    if z_timer > 0:
+        z_timer -= 1
     s.clear()
     s.write(".b." + str(bounds_timer) + ".t." + str(clear_timer) + ".s." + str(boost_timer), align = "right", font =("Courier New", 5, "bold"))
     screen.ontimer(timer_manager, 1000)
@@ -369,6 +472,8 @@ while True:
     player_coordinates()
     trail_clear()  #ig this could also go under left() and right() and still function the same, but any weird movement-related glitches will be caught under this locations, so the cmd will be living over here :>
     bounds_error_check()
+    obstacles_moving()
     #bounds_timer_time()
     #boost_timer_time()
+    z_clear()
     screen.update()
