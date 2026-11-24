@@ -1,5 +1,8 @@
 # Terra-W5--Achieving-Apotheosis
-A game about climbing/gaining elevation. Might also expand to include motivational text about striving to achieve greater "heights" to personal accomplishments, if time allows. Python Turtle-- planning on a game where the obstacles move down and the player moves sideways, bound to the bottom of the screen on a horizontal axis.
+
+#What is this??
+A game about surviving as a turtle. Didn't quite get the chance to include motivational text about striving to achieve greater "heights" to personal accomplishments, if time allows. 
+- This game was made with Python Turtl! The obstacles move down and the player moves sideways, bound to the bottom of the screen on a horizontal axis.
 
 ## You were unconscious, andddd surprise! You've awaken as a turtle.
 
